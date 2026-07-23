@@ -4,7 +4,7 @@ Flask + MediaPipe Hands (Yeni API)
 Sadece eli tespit eder, temiz ve profesyonel görünüm
 """
 
-from flask import Flask, render_template, Response
+from flask import Flask, render_template, Response, request
 import cv2
 import numpy as np
 import atexit
