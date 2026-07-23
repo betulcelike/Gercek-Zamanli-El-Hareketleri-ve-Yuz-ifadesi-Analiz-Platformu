@@ -1,0 +1,28 @@
+# Python sanal ortamı (virtual environment)
+venv/
+.venv/
+ENV/
+env/
+
+# Python önbellek dosyaları
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Büyük Yapay Zeka Model Dosyaları
+*.task
+*.tflite
+
+# Kullanıcının çektiği fotoğraflar (GitHub'a yüklenmesin)
+static/captured/*
+!static/captured/.gitkeep
+
+# VS Code ayarları
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp

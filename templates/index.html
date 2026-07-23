@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Takip Sistemi</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Kamera Flaş Efekti -->
+    <div id="shutter-flash" class="shutter-flash"></div>
+
+    <div class="app-layout">
+        <!-- Sol Seçenekler Paneli (Kalıcı Olarak Görünür) -->
+        <aside class="sidebar-panel">
+            <!-- Logo -->
+            <div class="sidebar-logo">
+                <span class="logo-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v5" /><path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v6" /><path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8" /><path d="M6 14v-1.5a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v1.5" /><path d="M18 15v3a6 6 0 0 1-6 6h-2a8 8 0 0 1-8-8v-3" /></svg>
+                </span>
+                <span class="logo-text">HandTrack</span>
+            </div>
+
+            <!-- Kaydırılabilir İçerik Alanı -->
+            <div class="sidebar-content">
+                <!-- 1. Görüntü Filtreleri -->
+                <div class="sidebar-section">
+                    <h4 class="section-title">Görüntü Filtreleri</h4>
+                    <div class="filter-grid">
+                        <button class="filter-btn active" data-filter="normal">Normal</button>
+                        <button class="filter-btn" data-filter="grayscale">Gri Ton</button>
+                        <button class="filter-btn" data-filter="sepia">Sepia</button>
+                        <button class="filter-btn" data-filter="invert">Negatif</button>
+                        <button class="filter-btn" data-filter="blur">Bulanık</button>
+                        <button class="filter-btn" data-filter="contrast">Kontrast</button>
+                    </div>
+                </div>
+
+                <!-- 2. Kamera Ayarları -->
+                <div class="sidebar-section">
+                    <h4 class="section-title">Kamera Ayarları</h4>
+                    <div class="slider-group">
+                        <label>Parlaklık</label>
+                        <div class="slider-wrapper">
+                            <input type="range" id="brightness" min="50" max="150" value="100">
+                            <span class="slider-value" id="brightness-value">100%</span>
+                        </div>
+                    </div>
+                    <div class="sidebar-divider"></div>
+                    <div class="slider-group">
+                        <label>Doygunluk</label>
+                        <div class="slider-wrapper">
+                            <input type="range" id="saturation" min="0" max="200" value="100">
+                            <span class="slider-value" id="saturation-value">100%</span>
+                        </div>
+                    </div>
+                    <div class="sidebar-divider"></div>
+                    <div class="slider-group">
+                        <label>Kontrast</label>
+                        <div class="slider-wrapper">
+                            <input type="range" id="contrast" min="50" max="150" value="100">
+                            <span class="slider-value" id="contrast-value">100%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Canlı Takip İstatistikleri -->
+                <div class="sidebar-section">
+                    <h4 class="section-title">Canlı Takip Bilgisi</h4>
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <span class="stat-label">Aktif El Sayısı</span>
+                            <span class="stat-val" id="live-hands-val">0</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-label">Açık Parmak</span>
+                            <span class="stat-val" id="live-fingers-val">0</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-label">Algılanan El</span>
+                            <span class="stat-val" id="live-hand-type-val">Hiçbiri</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-label">Aktif Yüz Sayısı</span>
+                            <span class="stat-val" id="live-faces-val">0</span>
+                        </div>
+                        <div class="stat-box full-width">
+                            <span class="stat-label">Yüz İfadesi</span>
+                            <span class="stat-val highlight" id="live-expression-val">Normal</span>
+                        </div>
+                        <div class="stat-box full-width flex-col">
+                            <span class="stat-label">Algılanan Nesneler</span>
+                            <span class="stat-val highlight scrollable" id="detected-objects-val">Hiçbiri</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Galeri Kartı -->
+                <div class="sidebar-section gallery-section">
+                    <h4 class="section-title">Çekilen Fotoğraflar</h4>
+                    <p class="gallery-info-text">
+                        Kameraya karşı <strong>Başparmak Yukarı (👍)</strong> işareti yaptıktan <strong>2 saniye sonra</strong> çeker.
+                    </p>
+                    <div class="photo-gallery" id="photo-gallery">
+                        <span class="no-photos-msg">Henüz fotoğraf çekilmedi.</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Sağ Geniş Kamera Alanı -->
+        <main class="camera-viewport">
+            <!-- Üst Yüzen Meta Bilgi Çubuğu -->
+            <div class="camera-header">
+                <div class="system-status">
+                    <span class="status-dot"></span>
+                    <span>Canlı Akış</span>
+                </div>
+                <div class="camera-meta">
+                    <span id="fps-value" class="fps-badge">30</span> FPS
+                </div>
+            </div>
+
+            <!-- Kamera Ekranı Wrapper (Tüm Kalan Alanı Doldurur) -->
+            <div class="camera-screen-container">
+                <img id="video-stream" src="/video_feed" alt="Video Stream">
+                
+                <!-- Overlay Corners -->
+                <div class="video-overlay">
+                    <div class="corner top-left"></div>
+                    <div class="corner top-right"></div>
+                    <div class="corner bottom-left"></div>
+                    <div class="corner bottom-right"></div>
+                </div>
+
+                <!-- Geri Sayım Overlay -->
+                <div class="countdown-overlay" id="countdown-overlay">2</div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Işık Kutusu (Lightbox Modal) -->
+    <div id="lightbox-modal" class="lightbox-modal">
+        <!-- Büyük ve Belirgin Kapat Butonu -->
+        <button class="lightbox-close-btn" id="lightbox-close-btn">&times; Kapat</button>
+        
+        <div class="lightbox-content">
+            <div class="lightbox-body">
+                <img id="lightbox-img" src="" alt="Detailed View">
+                
+                <!-- Fotoğraf Filtre/Efekt Ekleme Çubuğu -->
+                <div class="lightbox-effects-section">
+                    <span class="effects-title">Filtre Uygula:</span>
+                    <div class="effects-toolbar">
+                        <button class="effect-btn active" data-effect="normal">Orijinal</button>
+                        <button class="effect-btn" data-effect="grayscale">Gri Ton</button>
+                        <button class="effect-btn" data-effect="sepia">Sepia</button>
+                        <button class="effect-btn" data-effect="invert">Negatif</button>
+                        <button class="effect-btn" data-effect="blur">Bulanık</button>
+                        <button class="effect-btn" data-effect="warm">Sıcak</button>
+                        <button class="effect-btn" data-effect="cool">Soğuk</button>
+                    </div>
+                    <button class="save-effect-btn" id="save-effect-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                        Efekti Kaydet
+                    </button>
+                </div>
+
+                <div class="lightbox-details">
+                    <span class="lightbox-date" id="lightbox-date">Tarih: --/--/----</span>
+                    <button class="lightbox-delete-btn" id="lightbox-delete-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        Fotoğrafı Sil
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
